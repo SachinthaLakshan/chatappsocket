@@ -2,18 +2,17 @@ const express = require("express")
 const http = require("http")
 const app = express()
 const server = http.createServer(app)
-const io = require("socket.io")(server, {
+const { Server } = require("socket.io");
+const io = new Server(server, {
 	cors: {
 		origins: ['*']
 	}
-})
+});
 
-app.use("/test",
+app.use("/",
 	async (req, res, next) => {
-		return res.status(200).json({
-			title: "Express Testing",
-			message: "The app is working properly!",
-		});
+		res.write(`<h1>Socket IO Start on Port : ${process.env.PORT || 9001}</h1>`);
+		res.end();
 	}
 );
 
