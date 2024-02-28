@@ -17,21 +17,19 @@ app.use("/",
 );
 
 io.on("connection", (socket) => {
-	socket.emit("me", socket.id)
+	socket.emit("me", socket.id);
 
 	socket.on("disconnect", () => {
 		socket.broadcast.emit("callEnded")
-	})
+	});
 
-	socket.on("callUser", (data) => {
-		console.log("end user:",data.userToCall);
-		console.log("from user:",data.from);
-		io.emit(`callUser-${data.userToCall}`, { signal: data.signalData, from: data.from, name: data.name })
-	})
+	socket.on("callUser", ({ userToCall, signalData, from, name }) => {
+		io.to(userToCall).emit("callUser", { signal: signalData, from, name });
+	});
 
 	socket.on("answerCall", (data) => {
-		io.emit(`callAccepted-${data.to}`, data.signal)
-	})
-})
+		io.to(data.to).emit("callAccepted", data.signal)
+	});
+});
 
 server.listen(process.env.PORT || 9001, () => console.log("server is running on port 9001"))
